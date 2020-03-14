@@ -5,13 +5,18 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const keys = require('../../config/keys')
 const passport = require('passport')
-
+const validateRegisterInput = require('../../validation/register')
+const validateLoginInput = require('../../validation/login')
 const router = express.Router(); //instantiating only the router library of the express
 //@route POST api/users/register
 //@desc Register the User
 //@access public
 
 router.post('/register', (req,res) => {
+  const {errors, isValid} = validateRegisterInput(req.body) //deconstruction of an object
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
   User.findOne({email: req.body.email}) //email is schema email and req.body.email is the user typed email on the UI
     .then(userInfo => {
       if (userInfo) {
@@ -44,6 +49,10 @@ router.post('/register', (req,res) => {
 //@access public
 
 router.post('/login',(req,res)=>{
+  const {errors, isValid} = validateLoginInput(req.body) //deconstruction of an object
+  if(!isValid) {
+    return res.status(400).json(errors)
+  }
   User.findOne({email: req.body.email})
   .then(userInfo => {
     if(!userInfo) {
