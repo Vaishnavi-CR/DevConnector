@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import classnames from 'classnames'
+import {connect} from 'react-redux'
+import {registerUser} from '../../actions/authActions'
+
+
 class Register extends Component {
 
   constructor() {
@@ -30,16 +34,21 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     }
-    axios.post('api/users/register', newUser)
-      .then(res => console.log(res.data))
-      .catch(err => this.setState({ errors: err.response.data }))
+    // axios.post('api/users/register', newUser)
+    //   .then(res => console.log(res.data))
+    //   .catch(err => this.setState({ errors: err.response.data }))
+
+    //firing the action
+    this.props.registerUser(newUser)
   }
 
   render() {
     //const errors = this.state.errors javascript deconstruction syntax
     const {errors} = this.state
+    const { user } = this.props.auth
     return (
       <div className="register">
+        {user ? user.name : null}
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -101,4 +110,14 @@ class Register extends Component {
   }
 }
 
-export default Register
+const mapStateToProps = (state) => ({auth: state.auth})
+//state is the data in the redux store-we are assigning the auth of props to 
+//auth of redux state
+
+export default connect(mapStateToProps, {registerUser})(Register)
+//connect - connects the UI with redux store and the action - it takes 2 parameters 
+//first says the redux store and second is the action
+//props is the property value of the parent class (Component) in React
+//when a component(Register component in our case) is connected to Redux store via connect, the //action gets automatically added to Component props
+//data that we add to the redux store and data that get back from redux store - it is through 
+//the props
