@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+
 import classnames from 'classnames'
 import {connect} from 'react-redux'
 import {registerUser} from '../../actions/authActions'
+import PropTypes from 'prop-types'
 
 
 class Register extends Component {
@@ -34,17 +35,23 @@ class Register extends Component {
       password: this.state.password,
       password2: this.state.password2
     }
-    // axios.post('api/users/register', newUser)
-    //   .then(res => console.log(res.data))
-    //   .catch(err => this.setState({ errors: err.response.data }))
+    
 
     //firing the action
-    this.props.registerUser(newUser)
+    this.props.registerUser(newUser, this.props.history)
   }
-
+  componentWillReceiveProps(newProps) {
+    if(newProps.errors) {
+      this.setState({errors: newProps.errors})
+    }
+  }
   render() {
     //const errors = this.state.errors javascript deconstruction syntax
-    const {errors} = this.state
+    //const {errors} = this.state //as of 04/05 class, error is not coming from the local state
+    //variable rather it is coming from the store, hence making the const {errors}=this.state
+    //as comment and writing a new line
+    //const { errors } = this.props //as of 04/05 25th minute video
+    const { errors } = this.state //as of 04/05 32nd minute video 
     const { user } = this.props.auth
     return (
       <div className="register">
@@ -109,8 +116,16 @@ class Register extends Component {
     )
   }
 }
+Register.propTypes = {
 
-const mapStateToProps = (state) => ({auth: state.auth})
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+}
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+  errors: state.errors
+})
 //state is the data in the redux store-we are assigning the auth of props to 
 //auth of redux state
 
@@ -121,3 +136,11 @@ export default connect(mapStateToProps, {registerUser})(Register)
 //when a component(Register component in our case) is connected to Redux store via connect, the //action gets automatically added to Component props
 //data that we add to the redux store and data that get back from redux store - it is through 
 //the props
+
+//PropTypes makes sure that all the functions required off of the 
+//redux store are available before the component loads
+
+//04/05 30th minute. about difference life cycle stages of a component. constructor being 
+//the first one and render being the last one
+//component will receive props is a life cycle stage of component that triggers when new data
+//arrives from the redux store
