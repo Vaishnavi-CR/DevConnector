@@ -24,6 +24,8 @@ dispatch => {
     .then(res => {
       const {token} = res.data
       //save token to local storage - means browser storage - more like a browser session
+      localStorage.setItem('jwtToken', token)
+
       //attach token to axios header
       setAuthToken(token)
 
@@ -41,4 +43,19 @@ dispatch => {
       payload: err.response.data
     }))
 }
+
+//Logout user action
+export const logoutUser = () => dispatch => {
+  //Remove from localstorage
+  localStorage.removeItem('jwtToken');
+  //Remove from auth header
+  setAuthToken(false);
+  //clean up from Redux Store
+  dispatch({
+    type: SET_CURRENT_USER,
+    payload: {}
+  })
+}
+
+
 //we can write as many actions as we want and they can be accessed by different UI components
